@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 contract PropertyRegistry {
-    
-    uint private property_id=1;
+    uint256 constant MAX_PROPERTIES_SHARE = 100;   
+    uint256 private property_id=1;
     struct Property {
         string name;
         string location;
@@ -88,4 +88,11 @@ contract PropertyRegistry {
         return property_share[msg.sender][_propertyid];
     }
 
+    function buyProperty(uint256 _index, uint256 _share) public payable {
+        require(msg.value == properties[_index].price, "Invalid amount");
+        require(_share <= MAX_PROPERTIES_SHARE, "Invalid share");
+        require(property_share[msg.sender][_index] == 0, "Already bought");
+        property_share[msg.sender][_index] = _share;
+        property_holders[_index].push(msg.sender);
+    }
 }
